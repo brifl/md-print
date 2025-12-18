@@ -48,7 +48,7 @@ Bind the service in your tunnel config:
 ```yaml
 ingress:
   - hostname: md-print.example.com
-    service: http://localhost:7070
+    service: http://localhost:54443
   - service: http_status:404
 ```
 

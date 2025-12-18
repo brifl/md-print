@@ -28,4 +28,4 @@ def index():
 
 if __name__ == "__main__":
     # Bind to all interfaces so Cloudflare Tunnel can reach it
-    app.run(host="0.0.0.0", port=7070, debug=False)
+    app.run(host="0.0.0.0", port=54443, debug=False)
