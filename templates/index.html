@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Markdown Print Preview</title>
+    <link rel="stylesheet" href="/static/print.css">
+</head>
+<body>
+
+<div class="screen-only">
+    <form method="post">
+        <textarea name="markdown" placeholder="Paste Markdown here...">{{ source }}</textarea>
+        <div class="controls">
+            <button type="submit">Render</button>
+            <button type="button" onclick="window.print()">Print</button>
+        </div>
+    </form>
+</div>
+
+<hr class="screen-only">
+
+<div class="print-area">
+    {{ rendered_html | safe }}
+</div>
+
+</body>
+</html>

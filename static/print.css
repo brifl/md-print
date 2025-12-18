@@ -1,0 +1,60 @@
+body {
+    font-family: serif;
+    font-size: 11pt;
+    line-height: 1.35;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    width: 100%;
+    height: 40vh;
+    font-family: monospace;
+    font-size: 10pt;
+}
+
+.controls {
+    margin-top: 8px;
+}
+
+.print-area {
+    max-width: 7.25in;
+    margin: 0 auto;
+}
+
+h1, h2, h3 {
+    page-break-after: avoid;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+}
+
+pre {
+    border: 1px solid #000;
+    padding: 6px;
+    font-size: 9pt;
+    overflow-wrap: break-word;
+}
+
+code {
+    font-family: monospace;
+}
+
+@media print {
+    .screen-only {
+        display: none;
+    }
+
+    body {
+        margin: 0.75in;
+    }
+}
