@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const editorSizeValue = document.querySelector(".js-editor-size-value");
   const previewZoom = document.querySelector(".js-preview-zoom");
   const previewZoomValue = document.querySelector(".js-preview-zoom-value");
+  const previewStage = document.querySelector(".js-preview-stage");
+  const pageGuides = document.querySelector(".js-page-guides");
+  const pagePreview = document.querySelector(".js-page-preview");
   const settingsDrawer = document.querySelector(".js-settings-drawer");
   const settingsToggle = document.querySelector(".js-settings-toggle");
   const settingsCloseButtons = Array.from(
@@ -23,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const densityButtons = Array.from(
     document.querySelectorAll(".js-density-button"),
   );
+  const paperSize = document.querySelector(".js-paper-size");
+  const printMargin = document.querySelector(".js-print-margin");
+  const printMarginValue = document.querySelector(".js-print-margin-value");
   const printWidth = document.querySelector(".js-print-width");
   const printWidthValue = document.querySelector(".js-print-width-value");
   const printCodeSize = document.querySelector(".js-print-code-size");
@@ -91,9 +97,71 @@ document.addEventListener("DOMContentLoaded", () => {
     "Paste your Markdown and hit Render or toggle Live preview.",
   ].join("\n");
 
+  const measurementProbe = document.createElement("div");
+  measurementProbe.style.position = "absolute";
+  measurementProbe.style.visibility = "hidden";
+  measurementProbe.style.pointerEvents = "none";
+  measurementProbe.style.height = "0";
+  measurementProbe.style.width = "0";
+  document.body.appendChild(measurementProbe);
+
+  const getCssVar = (name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  const measureCssLength = (value) => {
+    if (!value) {
+      return 0;
+    }
+    measurementProbe.style.width = value;
+    return measurementProbe.getBoundingClientRect().width;
+  };
+
+
+  const updatePageGuides = () => {
+    if (!pageGuides || !pagePreview || !preview) {
+      return;
+    }
+    const pageHeight = measureCssLength(getCssVar("--page-height")) || 0;
+    const pageWidth = measureCssLength(getCssVar("--page-width")) || 0;
+    const margin = measureCssLength(getCssVar("--print-margin")) || 0;
+    if (!pageHeight || !pageWidth) {
+      return;
+    }
+    const contentHeight = preview.scrollHeight || 0;
+    const totalHeight = contentHeight + margin * 2;
+    const pageCount = Math.max(1, Math.ceil(totalHeight / pageHeight));
+    const totalPagesHeight = pageCount * pageHeight;
+
+    pageGuides.innerHTML = "";
+    pageGuides.style.height = `${totalPagesHeight}px`;
+    pageGuides.style.width = `${pageWidth}px`;
+    pagePreview.style.minHeight = `${totalPagesHeight}px`;
+
+    for (let i = 0; i < pageCount; i += 1) {
+      const guide = document.createElement("div");
+      guide.className = "page-guide";
+      guide.style.top = `${i * pageHeight}px`;
+      pageGuides.appendChild(guide);
+    }
+  };
+
+  const schedulePageGuides = (() => {
+    let frame;
+    return () => {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        updatePageGuides();
+      });
+    };
+  })();
+
   const setPreviewHtml = (html) => {
     const trimmed = (html || "").trim();
     preview.innerHTML = trimmed ? html : placeholderHtml;
+    schedulePageGuides();
   };
 
   const setError = (message) => {
@@ -126,6 +194,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  const paperSizes = {
+    letter: { width: "8.5in", height: "11in" },
+    a4: { width: "8.27in", height: "11.69in" },
+    legal: { width: "8.5in", height: "14in" },
+  };
+
+  const setPaperSize = (value) => {
+    const key = paperSizes[value] ? value : "letter";
+    const { width, height } = paperSizes[key];
+    document.documentElement.style.setProperty("--page-width", width);
+    document.documentElement.style.setProperty("--page-height", height);
+    if (paperSize) {
+      paperSize.value = key;
+    }
+    schedulePageGuides();
+  };
+
+  const setPrintMargin = (value) => {
+    const margin = Number(value) || 0.75;
+    document.documentElement.style.setProperty("--print-margin", `${margin}in`);
+    if (printMarginValue) {
+      printMarginValue.textContent = `${margin}in`;
+    }
+    schedulePageGuides();
+  };
+
   const densityPresets = {
     compact: { lineHeight: 1.25, paragraphSpacing: 0.55, headingSpacing: 0.7 },
     normal: { lineHeight: 1.4, paragraphSpacing: 0.75, headingSpacing: 0.9 },
@@ -136,7 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
       ?.dataset.density || "normal";
   const defaultPrintSettings = {
     density: defaultDensity,
-    width: printWidth?.getAttribute("value") || "7.25",
+    paper: paperSize?.value || "letter",
+    margin: printMargin?.getAttribute("value") || "0.75",
+    width: printWidth?.getAttribute("value") || "7",
     codeSize: printCodeSize?.getAttribute("value") || "9",
     tablePadding: printTablePadding?.getAttribute("value") || "4",
   };
@@ -160,14 +256,16 @@ document.addEventListener("DOMContentLoaded", () => {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
+    schedulePageGuides();
   };
 
   const setPrintWidth = (value) => {
-    const width = Number(value) || 7.25;
+    const width = Number(value) || 7;
     document.documentElement.style.setProperty("--print-width", `${width}in`);
     if (printWidthValue) {
       printWidthValue.textContent = `${width}in`;
     }
+    schedulePageGuides();
   };
 
   const setPrintCodeSize = (value) => {
@@ -176,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printCodeSizeValue) {
       printCodeSizeValue.textContent = `${size}pt`;
     }
+    schedulePageGuides();
   };
 
   const setPrintTablePadding = (value) => {
@@ -192,6 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printTablePaddingValue) {
       printTablePaddingValue.textContent = `${vertical}px / ${horizontal}px`;
     }
+    schedulePageGuides();
   };
 
   const openSettings = () => {
@@ -234,7 +334,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const controller = new AbortController();
     activeController = controller;
 
-    preview.classList.add("is-loading");
+    const loadingTarget = previewStage || preview;
+    loadingTarget.classList.add("is-loading");
     preview.setAttribute("aria-busy", "true");
 
     try {
@@ -281,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (activeController === controller) {
         activeController = null;
       }
-      preview.classList.remove("is-loading");
+      loadingTarget.classList.remove("is-loading");
       preview.removeAttribute("aria-busy");
     }
   };
@@ -300,6 +401,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const resetPrintSettings = () => {
     applyDensity(defaultPrintSettings.density);
+    if (paperSize) {
+      paperSize.value = defaultPrintSettings.paper;
+      setPaperSize(paperSize.value);
+    }
+    if (printMargin) {
+      printMargin.value = defaultPrintSettings.margin;
+      setPrintMargin(printMargin.value);
+    }
     if (printWidth) {
       printWidth.value = defaultPrintSettings.width;
       setPrintWidth(printWidth.value);
@@ -321,6 +430,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
     applyDensity(defaultPrintSettings.density);
+  }
+
+  if (paperSize) {
+    setPaperSize(paperSize.value);
+    paperSize.addEventListener("change", () => setPaperSize(paperSize.value));
+  }
+
+  if (printMargin) {
+    setPrintMargin(printMargin.value);
+    printMargin.addEventListener("input", () =>
+      setPrintMargin(printMargin.value),
+    );
   }
 
   if (printWidth) {
@@ -399,4 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  window.addEventListener("resize", schedulePageGuides);
+  schedulePageGuides();
 });

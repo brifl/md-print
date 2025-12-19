@@ -52,6 +52,23 @@
                 </div>
                 <div class="settings-drawer__content">
                     <fieldset class="settings-group">
+                        <legend>Paper</legend>
+                        <label class="select" for="paper-size">
+                            <span>Paper size</span>
+                            <select id="paper-size" class="js-paper-size">
+                                <option value="letter">US Letter (8.5 × 11 in)</option>
+                                <option value="a4">A4 (210 × 297 mm)</option>
+                                <option value="legal">US Legal (8.5 × 14 in)</option>
+                            </select>
+                        </label>
+                        <label class="slider settings-slider" for="print-margin">
+                            <span>Page margin</span>
+                            <input id="print-margin" class="js-print-margin" type="range" min="0.25" max="1.5" step="0.25" value="0.75">
+                            <output class="js-print-margin-value" for="print-margin">0.75in</output>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="settings-group">
                         <legend>Density</legend>
                         <div class="segmented">
                             <button type="button" class="segmented__item js-density-button" data-density="compact" aria-pressed="false">
@@ -71,8 +88,8 @@
                         <legend>Layout</legend>
                         <label class="slider settings-slider" for="print-width">
                             <span>Content width</span>
-                            <input id="print-width" class="js-print-width" type="range" min="6.25" max="8.5" step="0.25" value="7.25">
-                            <output class="js-print-width-value" for="print-width">7.25in</output>
+                            <input id="print-width" class="js-print-width" type="range" min="6.25" max="8.5" step="0.25" value="7">
+                            <output class="js-print-width-value" for="print-width">7in</output>
                         </label>
                     </fieldset>
 
@@ -116,12 +133,17 @@
                     <div class="pane-subtitle">Print-ready layout</div>
                 </div>
                 <div class="preview-surface">
-                    <div class="print-area preview-content js-preview">
-                        {% if rendered_html %}
-                            {{ rendered_html | safe }}
-                        {% else %}
-                            <div class="preview-empty">Preview will appear here.</div>
-                        {% endif %}
+                    <div class="preview-stage js-preview-stage">
+                        <div class="page-guides screen-only js-page-guides" aria-hidden="true"></div>
+                        <div class="page-preview js-page-preview">
+                            <div class="print-area preview-content js-preview">
+                                {% if rendered_html %}
+                                    {{ rendered_html | safe }}
+                                {% else %}
+                                    <div class="preview-empty">Preview will appear here.</div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
