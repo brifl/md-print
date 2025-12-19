@@ -95,6 +95,26 @@ def test_empty_markdown_shows_error():
     assert "Paste Markdown to render." in page
 
 
+def test_render_endpoint_returns_json():
+    client = make_client()
+    response = client.post("/render", json={"markdown": "# Title"})
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["error"] is None
+    assert "<h1>" in data["html"]
+
+
+def test_render_endpoint_empty_returns_error():
+    client = make_client()
+    response = client.post("/render", json={"markdown": "   "})
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["error"] == "Paste Markdown to render."
+    assert data["html"] == ""
+
+
 def test_request_too_large_returns_413():
     client = make_client(Settings(max_content_length=100))
     response = client.post("/", data={"markdown": "x" * 1000})
@@ -102,6 +122,15 @@ def test_request_too_large_returns_413():
     assert response.status_code == 413
     page = response.get_data(as_text=True)
     assert "Markdown is too large." in page
+
+
+def test_render_endpoint_too_large_returns_json():
+    client = make_client(Settings(max_content_length=100))
+    response = client.post("/render", json={"markdown": "x" * 1000})
+
+    assert response.status_code == 413
+    data = response.get_json()
+    assert "Markdown is too large." in data["error"]
 
 
 def test_allow_html_still_sanitizes():

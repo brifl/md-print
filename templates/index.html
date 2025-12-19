@@ -7,25 +7,63 @@
     <link rel="stylesheet" href="/static/print.css">
 </head>
 <body>
+<div class="app">
+    <form class="app-form" method="post">
+        <div class="toolbar screen-only">
+            <div class="toolbar__section">
+                <button type="submit" class="primary js-render">Render</button>
+                <button type="button" class="js-print">Print</button>
+                <button type="button" class="js-clear">Clear</button>
+                <button type="button" class="js-sample">Insert sample</button>
+            </div>
+            <div class="toolbar__section toolbar__section--controls">
+                <label class="toggle" for="live-preview">
+                    <input id="live-preview" class="js-live-toggle" type="checkbox">
+                    <span>Live preview</span>
+                </label>
+                <label class="slider" for="editor-size">
+                    <span>Editor size</span>
+                    <input id="editor-size" class="js-editor-size" type="range" min="12" max="20" step="1" value="14">
+                    <output class="js-editor-size-value" for="editor-size">14px</output>
+                </label>
+                <label class="slider" for="preview-zoom">
+                    <span>Preview zoom</span>
+                    <input id="preview-zoom" class="js-preview-zoom" type="range" min="80" max="140" step="5" value="100">
+                    <output class="js-preview-zoom-value" for="preview-zoom">100%</output>
+                </label>
+            </div>
+        </div>
 
-<div class="screen-only">
-    <form method="post">
-        <label for="markdown-input">Markdown</label>
-        <textarea id="markdown-input" name="markdown" placeholder="Paste Markdown here...">{{ source }}</textarea>
-        {% if error %}
-            <div class="alert">{{ error }}</div>
-        {% endif %}
-        <div class="controls">
-            <button type="submit">Render</button>
-            <button type="button" class="js-print">Print</button>
+        <div class="workspace">
+            <section class="pane editor-pane screen-only">
+                <div class="pane-header">
+                    <label for="markdown-input">Markdown</label>
+                </div>
+                <textarea id="markdown-input" class="js-markdown" name="markdown" placeholder="Paste Markdown here...">{{ source }}</textarea>
+                {% if error %}
+                    <div class="alert js-error" role="status" aria-live="polite">{{ error }}</div>
+                {% else %}
+                    <div class="alert js-error is-hidden" role="status" aria-live="polite"></div>
+                {% endif %}
+            </section>
+
+            <section class="pane preview-pane">
+                <div class="pane-header screen-only">
+                    <div class="pane-title">Preview</div>
+                    <div class="pane-subtitle">Print-ready layout</div>
+                </div>
+                <div class="preview-surface">
+                    <div class="print-area preview-content js-preview">
+                        {% if rendered_html %}
+                            {{ rendered_html | safe }}
+                        {% else %}
+                            <div class="preview-empty">Preview will appear here.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
         </div>
     </form>
-</div>
-
-<hr class="screen-only">
-
-<div class="print-area">
-    {{ rendered_html | safe }}
 </div>
 
 <script src="/static/app.js" defer></script>

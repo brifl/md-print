@@ -146,12 +146,15 @@ def create_app(settings: Settings | None = None) -> Flask:
     @app.errorhandler(413)
     def request_too_large(_):
         limit_kb = max(1, settings.max_content_length // 1024)
+        message = f"Markdown is too large. Limit is {limit_kb} KB."
+        if request.is_json:
+            return {"error": message}, 413
         return (
             render_template(
                 "index.html",
                 rendered_html="",
                 source="",
-                error=f"Markdown is too large. Limit is {limit_kb} KB.",
+                error=message,
             ),
             413,
         )
@@ -175,6 +178,19 @@ def create_app(settings: Settings | None = None) -> Flask:
             source=source,
             error=error,
         )
+
+    @app.route("/render", methods=["POST"])
+    def render_preview():
+        payload = request.get_json(silent=True) or {}
+        source = payload.get("markdown")
+        if source is None:
+            source = request.form.get("markdown", "")
+
+        if not source.strip():
+            return {"html": "", "error": "Paste Markdown to render."}
+
+        rendered_html = sanitize_html(md.render(source))
+        return {"html": rendered_html, "error": None}
 
     return app
 
