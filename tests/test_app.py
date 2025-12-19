@@ -86,6 +86,16 @@ def test_post_renders_markdown():
     assert "Title" in page
 
 
+def test_post_renders_tables():
+    client = make_client()
+    table_md = "| A | B |\n| --- | --- |\n| 1 | 2 |"
+    response = client.post("/", data={"markdown": table_md})
+
+    assert response.status_code == 200
+    page = response.get_data(as_text=True)
+    assert "<table>" in page
+
+
 def test_empty_markdown_shows_error():
     client = make_client()
     response = client.post("/", data={"markdown": "   "})

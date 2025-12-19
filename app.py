@@ -104,6 +104,7 @@ def load_settings() -> Settings:
 def build_markdown(allow_html: bool) -> MarkdownIt:
     md = MarkdownIt("commonmark", {"html": allow_html, "linkify": True})
     md.use(footnote_plugin).use(tasklists_plugin)
+    md.enable("table")
     return md
 
 
