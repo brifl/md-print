@@ -8,7 +8,7 @@ from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 
 DEFAULT_HOST = "127.0.0.1"
-DEFAULT_PORT = 7070
+DEFAULT_PORT = 54443
 DEFAULT_MAX_CONTENT_LENGTH = 1_000_000
 DEFAULT_ALLOW_HTML = False
 
