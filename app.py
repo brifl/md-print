@@ -36,6 +36,7 @@ ALLOWED_TAGS = [
     "p",
     "pre",
     "section",
+    "s",
     "strong",
     "sub",
     "sup",
@@ -102,9 +103,9 @@ def load_settings() -> Settings:
 
 
 def build_markdown(allow_html: bool) -> MarkdownIt:
-    md = MarkdownIt("commonmark", {"html": allow_html, "linkify": True})
+    md = MarkdownIt("default", {"html": allow_html, "linkify": True})
     md.use(footnote_plugin).use(tasklists_plugin)
-    md.enable("table")
+    md.enable(["table", "strikethrough"])
     return md
 
 

@@ -96,6 +96,15 @@ def test_post_renders_tables():
     assert "<table>" in page
 
 
+def test_post_renders_strikethrough():
+    client = make_client()
+    response = client.post("/", data={"markdown": "~~Strike~~"})
+
+    assert response.status_code == 200
+    page = response.get_data(as_text=True)
+    assert "<del>" in page or "<s>" in page
+
+
 def test_empty_markdown_shows_error():
     client = make_client()
     response = client.post("/", data={"markdown": "   "})
