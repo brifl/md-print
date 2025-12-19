@@ -393,48 +393,80 @@ textarea {
 
 .preview-stage {
     position: relative;
-    width: calc(100% / var(--preview-zoom));
     width: max(var(--page-width), calc(100% / var(--preview-zoom)));
     transform: scale(var(--preview-zoom));
     transform-origin: top left;
     margin: 0 auto;
 }
 
-.page-guides {
+.page-preview {
+    position: relative;
+    width: var(--page-width);
+    margin: 0 auto;
+}
+
+.preview-source {
+    width: var(--page-width);
+    margin: 0 auto;
+    padding: var(--print-margin);
+}
+
+.preview-stage.is-paged .preview-source {
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: var(--page-width);
-    height: 100%;
+    opacity: 0;
     pointer-events: none;
-    z-index: 0;
 }
 
-.page-guide {
-    position: absolute;
-    left: 0;
-    width: 100%;
+.page-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.page {
+    position: relative;
+    width: var(--page-width);
     height: var(--page-height);
     background: #fff;
     border: 1px solid var(--page-border);
-    border-bottom: 1px dotted var(--page-break);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    padding: var(--print-margin);
 }
 
-.page-guide::after {
+.page::before {
     content: "";
     position: absolute;
     inset: var(--print-margin);
     border: 1px dashed var(--page-margin);
+    pointer-events: none;
+    z-index: 0;
 }
 
-.page-preview {
-    position: relative;
+.page::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-bottom: 1px dotted var(--page-break);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.page:last-child::after {
+    display: none;
+}
+
+.page-slice {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     z-index: 1;
-    width: var(--page-width);
-    margin: 0 auto;
-    padding: var(--print-margin);
 }
 
 .page-preview .print-area {
@@ -667,8 +699,30 @@ textarea {
 
     .page-preview {
         width: auto;
-        padding: 0;
         min-height: 0 !important;
+    }
+
+    .preview-source {
+        position: static;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+        width: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    .preview-stage.is-paged .preview-source {
+        position: static;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .page-stack,
+    .page::before,
+    .page::after {
+        display: none !important;
     }
 
     .print-area {

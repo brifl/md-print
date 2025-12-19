@@ -134,15 +134,17 @@
                 </div>
                 <div class="preview-surface">
                     <div class="preview-stage js-preview-stage">
-                        <div class="page-guides screen-only js-page-guides" aria-hidden="true"></div>
                         <div class="page-preview js-page-preview">
-                            <div class="print-area preview-content js-preview">
-                                {% if rendered_html %}
-                                    {{ rendered_html | safe }}
-                                {% else %}
-                                    <div class="preview-empty">Preview will appear here.</div>
-                                {% endif %}
+                            <div class="preview-source js-preview-source">
+                                <div class="print-area preview-content js-preview">
+                                    {% if rendered_html %}
+                                        {{ rendered_html | safe }}
+                                    {% else %}
+                                        <div class="preview-empty">Preview will appear here.</div>
+                                    {% endif %}
+                                </div>
                             </div>
+                            <div class="page-stack screen-only js-page-stack" aria-hidden="true"></div>
                         </div>
                     </div>
                 </div>

@@ -15,8 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewZoom = document.querySelector(".js-preview-zoom");
   const previewZoomValue = document.querySelector(".js-preview-zoom-value");
   const previewStage = document.querySelector(".js-preview-stage");
-  const pageGuides = document.querySelector(".js-page-guides");
-  const pagePreview = document.querySelector(".js-page-preview");
+  const pageStack = document.querySelector(".js-page-stack");
   const settingsDrawer = document.querySelector(".js-settings-drawer");
   const settingsToggle = document.querySelector(".js-settings-toggle");
   const settingsCloseButtons = Array.from(
@@ -117,35 +116,44 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const updatePageGuides = () => {
-    if (!pageGuides || !pagePreview || !preview) {
+  const updatePagedPreview = () => {
+    if (!preview || !pageStack || !previewStage) {
       return;
     }
     const pageHeight = measureCssLength(getCssVar("--page-height")) || 0;
-    const pageWidth = measureCssLength(getCssVar("--page-width")) || 0;
     const margin = measureCssLength(getCssVar("--print-margin")) || 0;
-    if (!pageHeight || !pageWidth) {
+    const usableHeight = pageHeight - margin * 2;
+    if (!pageHeight || usableHeight <= 0) {
+      previewStage.classList.remove("is-paged");
       return;
     }
+
     const contentHeight = preview.scrollHeight || 0;
-    const totalHeight = contentHeight + margin * 2;
-    const pageCount = Math.max(1, Math.ceil(totalHeight / pageHeight));
-    const totalPagesHeight = pageCount * pageHeight;
+    const pageCount = Math.max(1, Math.ceil(contentHeight / usableHeight));
+    const sourceHtml = preview.innerHTML;
 
-    pageGuides.innerHTML = "";
-    pageGuides.style.height = `${totalPagesHeight}px`;
-    pageGuides.style.width = `${pageWidth}px`;
-    pagePreview.style.minHeight = `${totalPagesHeight}px`;
-
+    pageStack.innerHTML = "";
     for (let i = 0; i < pageCount; i += 1) {
-      const guide = document.createElement("div");
-      guide.className = "page-guide";
-      guide.style.top = `${i * pageHeight}px`;
-      pageGuides.appendChild(guide);
+      const page = document.createElement("div");
+      page.className = "page";
+
+      const slice = document.createElement("div");
+      slice.className = "page-slice";
+      slice.style.transform = `translateY(-${i * usableHeight}px)`;
+
+      const content = document.createElement("div");
+      content.className = "print-area";
+      content.innerHTML = sourceHtml;
+
+      slice.appendChild(content);
+      page.appendChild(slice);
+      pageStack.appendChild(page);
     }
+
+    previewStage.classList.add("is-paged");
   };
 
-  const schedulePageGuides = (() => {
+  const schedulePagedPreview = (() => {
     let frame;
     return () => {
       if (frame) {
@@ -153,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       frame = requestAnimationFrame(() => {
         frame = null;
-        updatePageGuides();
+        updatePagedPreview();
       });
     };
   })();
@@ -161,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const setPreviewHtml = (html) => {
     const trimmed = (html || "").trim();
     preview.innerHTML = trimmed ? html : placeholderHtml;
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const setError = (message) => {
@@ -208,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paperSize) {
       paperSize.value = key;
     }
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const setPrintMargin = (value) => {
@@ -217,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printMarginValue) {
       printMarginValue.textContent = `${margin}in`;
     }
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const densityPresets = {
@@ -256,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const setPrintWidth = (value) => {
@@ -265,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printWidthValue) {
       printWidthValue.textContent = `${width}in`;
     }
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const setPrintCodeSize = (value) => {
@@ -274,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printCodeSizeValue) {
       printCodeSizeValue.textContent = `${size}pt`;
     }
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const setPrintTablePadding = (value) => {
@@ -291,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printTablePaddingValue) {
       printTablePaddingValue.textContent = `${vertical}px / ${horizontal}px`;
     }
-    schedulePageGuides();
+    schedulePagedPreview();
   };
 
   const openSettings = () => {
@@ -521,6 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  window.addEventListener("resize", schedulePageGuides);
-  schedulePageGuides();
+  window.addEventListener("resize", schedulePagedPreview);
+  schedulePagedPreview();
 });
