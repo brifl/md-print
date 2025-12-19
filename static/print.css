@@ -12,6 +12,13 @@
     --mono-font: "SFMono-Regular", "Menlo", "Consolas", monospace;
     --editor-size: 14px;
     --preview-zoom: 1;
+    --print-width: 7.25in;
+    --print-line-height: 1.4;
+    --print-paragraph-spacing: 0.75em;
+    --print-heading-spacing: 0.9em;
+    --print-code-size: 9pt;
+    --print-table-padding-y: 4px;
+    --print-table-padding-x: 6px;
 }
 
 * {
@@ -132,6 +139,147 @@ textarea:focus-visible {
     color: var(--ink);
 }
 
+.settings-toggle {
+    white-space: nowrap;
+}
+
+.settings-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.settings-drawer[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.settings-drawer__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(24, 20, 14, 0.3);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.settings-drawer[data-open="true"] .settings-drawer__backdrop {
+    opacity: 1;
+}
+
+.settings-drawer__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(380px, 92vw);
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+}
+
+.settings-drawer[data-open="true"] .settings-drawer__panel {
+    transform: translateX(0);
+}
+
+.settings-drawer__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.settings-drawer__title {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.settings-drawer__subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.settings-drawer__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.settings-drawer__content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.settings-group {
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-group legend {
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.settings-group__help {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.segmented {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #f5efe3;
+    overflow: hidden;
+}
+
+.segmented__item {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 6px 14px;
+    margin: 0;
+    font-size: 0.85rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.segmented__item:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.segmented__item.is-active {
+    background: var(--accent);
+    color: #fff;
+}
+
+.settings-slider {
+    grid-template-columns: 1fr 1fr auto;
+}
+
 .workspace {
     display: grid;
     grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
@@ -240,13 +388,13 @@ textarea {
 }
 
 .print-area {
-    max-width: 7.25in;
+    max-width: var(--print-width);
     margin: 0 auto;
     padding: 12px 16px 28px;
     color: #000;
     font-family: var(--content-font);
     font-size: 11pt;
-    line-height: 1.4;
+    line-height: var(--print-line-height);
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -254,6 +402,30 @@ textarea {
 
 .print-area img {
     max-width: 100%;
+}
+
+.print-area p,
+.print-area ul,
+.print-area ol,
+.print-area blockquote,
+.print-area pre,
+.print-area table,
+.print-area hr {
+    margin: 0 0 var(--print-paragraph-spacing);
+}
+
+.print-area ul,
+.print-area ol {
+    padding-left: 1.2em;
+}
+
+.print-area h1,
+.print-area h2,
+.print-area h3,
+.print-area h4,
+.print-area h5,
+.print-area h6 {
+    margin: var(--print-heading-spacing) 0 0.5em;
 }
 
 .print-area h1,
@@ -265,20 +437,20 @@ textarea {
 .print-area table {
     border-collapse: collapse;
     width: 100%;
-    margin: 0.5em 0;
+    margin: 0 0 var(--print-paragraph-spacing);
 }
 
 .print-area th,
 .print-area td {
     border: 1px solid #000;
-    padding: 4px 6px;
+    padding: var(--print-table-padding-y) var(--print-table-padding-x);
 }
 
 .print-area pre {
     border: 1px solid #000;
     background: #f7f2ea;
     padding: 6px 8px;
-    font-size: 9pt;
+    font-size: var(--print-code-size);
     overflow-wrap: break-word;
     border-radius: 8px;
 }
@@ -351,6 +523,23 @@ textarea {
     .slider output {
         justify-self: start;
     }
+
+    .settings-drawer__panel {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 72vh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+    }
+
+    .settings-drawer[data-open="true"] .settings-drawer__panel {
+        transform: translateY(0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -391,7 +580,7 @@ textarea {
     }
 
     .print-area {
-        max-width: none;
+        max-width: var(--print-width);
         margin: 0;
         padding: 0;
         box-shadow: none;

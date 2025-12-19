@@ -14,6 +14,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const editorSizeValue = document.querySelector(".js-editor-size-value");
   const previewZoom = document.querySelector(".js-preview-zoom");
   const previewZoomValue = document.querySelector(".js-preview-zoom-value");
+  const settingsDrawer = document.querySelector(".js-settings-drawer");
+  const settingsToggle = document.querySelector(".js-settings-toggle");
+  const settingsCloseButtons = Array.from(
+    document.querySelectorAll(".js-settings-close"),
+  );
+  const settingsReset = document.querySelector(".js-settings-reset");
+  const densityButtons = Array.from(
+    document.querySelectorAll(".js-density-button"),
+  );
+  const printWidth = document.querySelector(".js-print-width");
+  const printWidthValue = document.querySelector(".js-print-width-value");
+  const printCodeSize = document.querySelector(".js-print-code-size");
+  const printCodeSizeValue = document.querySelector(".js-print-code-size-value");
+  const printTablePadding = document.querySelector(".js-print-table-padding");
+  const printTablePaddingValue = document.querySelector(
+    ".js-print-table-padding-value",
+  );
   const clearButton = document.querySelector(".js-clear");
   const sampleButton = document.querySelector(".js-sample");
 
@@ -109,6 +126,92 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  const densityPresets = {
+    compact: { lineHeight: 1.25, paragraphSpacing: 0.55, headingSpacing: 0.7 },
+    normal: { lineHeight: 1.4, paragraphSpacing: 0.75, headingSpacing: 0.9 },
+    roomy: { lineHeight: 1.6, paragraphSpacing: 1.0, headingSpacing: 1.2 },
+  };
+  const defaultDensity =
+    densityButtons.find((button) => button.classList.contains("is-active"))
+      ?.dataset.density || "normal";
+  const defaultPrintSettings = {
+    density: defaultDensity,
+    width: printWidth?.getAttribute("value") || "7.25",
+    codeSize: printCodeSize?.getAttribute("value") || "9",
+    tablePadding: printTablePadding?.getAttribute("value") || "4",
+  };
+
+  const applyDensity = (key) => {
+    const preset = densityPresets[key] || densityPresets.normal;
+    document.documentElement.style.setProperty(
+      "--print-line-height",
+      preset.lineHeight,
+    );
+    document.documentElement.style.setProperty(
+      "--print-paragraph-spacing",
+      `${preset.paragraphSpacing}em`,
+    );
+    document.documentElement.style.setProperty(
+      "--print-heading-spacing",
+      `${preset.headingSpacing}em`,
+    );
+    densityButtons.forEach((button) => {
+      const isActive = button.dataset.density === key;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  };
+
+  const setPrintWidth = (value) => {
+    const width = Number(value) || 7.25;
+    document.documentElement.style.setProperty("--print-width", `${width}in`);
+    if (printWidthValue) {
+      printWidthValue.textContent = `${width}in`;
+    }
+  };
+
+  const setPrintCodeSize = (value) => {
+    const size = Number(value) || 9;
+    document.documentElement.style.setProperty("--print-code-size", `${size}pt`);
+    if (printCodeSizeValue) {
+      printCodeSizeValue.textContent = `${size}pt`;
+    }
+  };
+
+  const setPrintTablePadding = (value) => {
+    const vertical = Number(value) || 4;
+    const horizontal = vertical + 2;
+    document.documentElement.style.setProperty(
+      "--print-table-padding-y",
+      `${vertical}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--print-table-padding-x",
+      `${horizontal}px`,
+    );
+    if (printTablePaddingValue) {
+      printTablePaddingValue.textContent = `${vertical}px / ${horizontal}px`;
+    }
+  };
+
+  const openSettings = () => {
+    if (!settingsDrawer || !settingsToggle) {
+      return;
+    }
+    settingsDrawer.dataset.open = "true";
+    settingsDrawer.setAttribute("aria-hidden", "false");
+    settingsToggle.setAttribute("aria-expanded", "true");
+  };
+
+  const closeSettings = () => {
+    if (!settingsDrawer || !settingsToggle) {
+      return;
+    }
+    settingsDrawer.dataset.open = "false";
+    settingsDrawer.setAttribute("aria-hidden", "true");
+    settingsToggle.setAttribute("aria-expanded", "false");
+  };
+
   const debounce = (fn, delay) => {
     let timer;
     return (...args) => {
@@ -194,6 +297,74 @@ document.addEventListener("DOMContentLoaded", () => {
     setPreviewZoom(previewZoom.value);
     previewZoom.addEventListener("input", () => setPreviewZoom(previewZoom.value));
   }
+
+  const resetPrintSettings = () => {
+    applyDensity(defaultPrintSettings.density);
+    if (printWidth) {
+      printWidth.value = defaultPrintSettings.width;
+      setPrintWidth(printWidth.value);
+    }
+    if (printCodeSize) {
+      printCodeSize.value = defaultPrintSettings.codeSize;
+      setPrintCodeSize(printCodeSize.value);
+    }
+    if (printTablePadding) {
+      printTablePadding.value = defaultPrintSettings.tablePadding;
+      setPrintTablePadding(printTablePadding.value);
+    }
+  };
+
+  if (densityButtons.length) {
+    densityButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyDensity(button.dataset.density);
+      });
+    });
+    applyDensity(defaultPrintSettings.density);
+  }
+
+  if (printWidth) {
+    setPrintWidth(printWidth.value);
+    printWidth.addEventListener("input", () => setPrintWidth(printWidth.value));
+  }
+
+  if (printCodeSize) {
+    setPrintCodeSize(printCodeSize.value);
+    printCodeSize.addEventListener("input", () =>
+      setPrintCodeSize(printCodeSize.value),
+    );
+  }
+
+  if (printTablePadding) {
+    setPrintTablePadding(printTablePadding.value);
+    printTablePadding.addEventListener("input", () =>
+      setPrintTablePadding(printTablePadding.value),
+    );
+  }
+
+  if (settingsToggle && settingsDrawer) {
+    settingsToggle.addEventListener("click", () => {
+      if (settingsDrawer.dataset.open === "true") {
+        closeSettings();
+      } else {
+        openSettings();
+      }
+    });
+  }
+
+  settingsCloseButtons.forEach((button) => {
+    button.addEventListener("click", () => closeSettings());
+  });
+
+  if (settingsReset) {
+    settingsReset.addEventListener("click", resetPrintSettings);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && settingsDrawer?.dataset.open === "true") {
+      closeSettings();
+    }
+  });
 
   if (liveToggle) {
     liveToggle.addEventListener("change", () => {

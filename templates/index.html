@@ -31,7 +31,70 @@
                     <input id="preview-zoom" class="js-preview-zoom" type="range" min="80" max="140" step="5" value="100">
                     <output class="js-preview-zoom-value" for="preview-zoom">100%</output>
                 </label>
+                <button type="button" class="settings-toggle js-settings-toggle" aria-expanded="false" aria-controls="print-settings-panel">
+                    Print settings
+                </button>
             </div>
+        </div>
+
+        <div class="settings-drawer screen-only js-settings-drawer" id="print-settings-panel" data-open="false" aria-hidden="true">
+            <div class="settings-drawer__backdrop js-settings-close" aria-hidden="true"></div>
+            <aside class="settings-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="print-settings-title">
+                <div class="settings-drawer__header">
+                    <div>
+                        <div class="settings-drawer__title" id="print-settings-title">Print settings</div>
+                        <div class="settings-drawer__subtitle">Affects printed output</div>
+                    </div>
+                    <div class="settings-drawer__actions">
+                        <button type="button" class="js-settings-reset">Reset</button>
+                        <button type="button" class="js-settings-close">Close</button>
+                    </div>
+                </div>
+                <div class="settings-drawer__content">
+                    <fieldset class="settings-group">
+                        <legend>Density</legend>
+                        <div class="segmented">
+                            <button type="button" class="segmented__item js-density-button" data-density="compact" aria-pressed="false">
+                                Compact
+                            </button>
+                            <button type="button" class="segmented__item js-density-button is-active" data-density="normal" aria-pressed="true">
+                                Normal
+                            </button>
+                            <button type="button" class="segmented__item js-density-button" data-density="roomy" aria-pressed="false">
+                                Roomy
+                            </button>
+                        </div>
+                        <p class="settings-group__help">Sets line height and paragraph spacing.</p>
+                    </fieldset>
+
+                    <fieldset class="settings-group">
+                        <legend>Layout</legend>
+                        <label class="slider settings-slider" for="print-width">
+                            <span>Content width</span>
+                            <input id="print-width" class="js-print-width" type="range" min="6.25" max="8.5" step="0.25" value="7.25">
+                            <output class="js-print-width-value" for="print-width">7.25in</output>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="settings-group">
+                        <legend>Code</legend>
+                        <label class="slider settings-slider" for="print-code-size">
+                            <span>Code size</span>
+                            <input id="print-code-size" class="js-print-code-size" type="range" min="8" max="12" step="0.5" value="9">
+                            <output class="js-print-code-size-value" for="print-code-size">9pt</output>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="settings-group">
+                        <legend>Tables</legend>
+                        <label class="slider settings-slider" for="print-table-padding">
+                            <span>Cell padding (v/h)</span>
+                            <input id="print-table-padding" class="js-print-table-padding" type="range" min="2" max="8" step="1" value="4">
+                            <output class="js-print-table-padding-value" for="print-table-padding">4px / 6px</output>
+                        </label>
+                    </fieldset>
+                </div>
+            </aside>
         </div>
 
         <div class="workspace">
