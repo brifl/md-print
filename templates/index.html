@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Markdown Print Preview</title>
     <link rel="stylesheet" href="/static/print.css">
 </head>
@@ -9,10 +10,14 @@
 
 <div class="screen-only">
     <form method="post">
-        <textarea name="markdown" placeholder="Paste Markdown here...">{{ source }}</textarea>
+        <label for="markdown-input">Markdown</label>
+        <textarea id="markdown-input" name="markdown" placeholder="Paste Markdown here...">{{ source }}</textarea>
+        {% if error %}
+            <div class="alert">{{ error }}</div>
+        {% endif %}
         <div class="controls">
             <button type="submit">Render</button>
-            <button type="button" onclick="window.print()">Print</button>
+            <button type="button" class="js-print">Print</button>
         </div>
     </form>
 </div>
@@ -23,5 +28,6 @@
     {{ rendered_html | safe }}
 </div>
 
+<script src="/static/app.js" defer></script>
 </body>
 </html>

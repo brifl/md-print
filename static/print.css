@@ -12,15 +12,40 @@ textarea {
     height: 40vh;
     font-family: monospace;
     font-size: 10pt;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #000;
+}
+
+.screen-only {
+    padding: 16px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
 .controls {
     margin-top: 8px;
 }
 
+.controls button {
+    margin-right: 8px;
+}
+
+.alert {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid #8a1c1c;
+    background: #fcecec;
+}
+
 .print-area {
     max-width: 7.25in;
-    margin: 0 auto;
+    margin: 16px auto;
+    padding: 0 16px;
 }
 
 h1, h2, h3 {
@@ -56,5 +81,11 @@ code {
 
     body {
         margin: 0.75in;
+    }
+
+    .print-area {
+        max-width: none;
+        margin: 0;
+        padding: 0;
     }
 }

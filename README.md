@@ -41,6 +41,20 @@ Open:
 http://localhost:7070
 ```
 
+## Configuration
+
+Environment variables:
+
+- `MD_PRINT_HOST` (default: `127.0.0.1`)
+- `MD_PRINT_PORT` (default: `7070`)
+- `MD_PRINT_MAX_CONTENT_LENGTH` in bytes (default: `1000000`)
+- `MD_PRINT_ALLOW_HTML` (default: `false`)
+
+Notes:
+
+- Raw HTML is disabled by default and sanitized even when enabled.
+- For Cloudflare Tunnel access, set `MD_PRINT_HOST=0.0.0.0`.
+
 ## Always-on systemd service setup on Raspberry Pi
 
 ````markdown
@@ -129,6 +143,84 @@ This project works well behind a Cloudflare Tunnel. If you manage routes in the 
 Notes
 
 - If you also maintain ingress rules in /etc/cloudflared/config.yml, be aware that dashboard managed routes can override expectations. When troubleshooting a 404, always confirm the hostname exists under Published application routes for the tunnel.
+
+## Updating the app (safe one-command deploy)
+
+This repo includes two small shell scripts to make updates reliable on a Raspberry Pi or other Linux host.
+
+### Files
+
+- `runner.sh`
+  Pulls the latest code from git, then invokes the deploy script.
+- `deploy.sh`
+  Activates the virtual environment, updates dependencies, and restarts the systemd service.
+
+This two-step design ensures that even if the deploy script itself changes, updates still complete correctly.
+
+---
+
+### First-time setup
+
+Make both scripts executable:
+
+```bash
+chmod +x runner.sh deploy.sh
+```
+
+---
+
+### Updating to the latest version
+
+From the repo root:
+
+```bash
+./runner.sh
+```
+
+What this does:
+
+1. Pulls the latest code from the main branch
+2. Activates the Python virtual environment
+3. Installs or updates dependencies from `requirements.txt`
+4. Restarts the `md-print` systemd service
+
+No reboot required.
+
+---
+
+### Configuration options (optional)
+
+You can override defaults using environment variables:
+
+- `BRANCH`
+  Git branch to pull (default: `main`)
+
+  ```bash
+  BRANCH=main ./runner.sh
+  ```
+
+- `SERVICE_NAME`
+  systemd service name (default: `md-print`)
+
+  ```bash
+  SERVICE_NAME=md-print ./runner.sh
+  ```
+
+---
+
+### Verifying the update
+
+After the script completes:
+
+```bash
+systemctl status md-print
+```
+
+For troubleshooting:
+
+```bash
+sudo journalctl -u md-print -n 50 --no-pager
+```
 
 ## Using the app (from anywhere)
 
