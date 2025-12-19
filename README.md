@@ -38,7 +38,7 @@ python app.py
 Open:
 
 ```text
-http://localhost:7070
+http://localhost:54443
 ```
 
 ## Configuration
@@ -46,7 +46,7 @@ http://localhost:7070
 Environment variables:
 
 - `MD_PRINT_HOST` (default: `127.0.0.1`)
-- `MD_PRINT_PORT` (default: `7070`)
+- `MD_PRINT_PORT` (default: `54443`)
 - `MD_PRINT_MAX_CONTENT_LENGTH` in bytes (default: `1000000`)
 - `MD_PRINT_ALLOW_HTML` (default: `false`)
 
@@ -54,6 +54,13 @@ Notes:
 
 - Raw HTML is disabled by default and sanitized even when enabled.
 - For Cloudflare Tunnel access, set `MD_PRINT_HOST=0.0.0.0`.
+
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
 ## Always-on systemd service setup on Raspberry Pi
 
@@ -65,7 +72,7 @@ This is the recommended way to keep the app running across reboots.
 Assumptions
 - Repo is located at: /home/pi/md-print
 - Virtualenv located at: /home/pi/md-print/.venv
-- App listens on port 7070 (adjust if you change it)
+- App listens on port 54443 (adjust if you change it)
 
 1. Create the service file
 
@@ -108,7 +115,7 @@ sudo journalctl -u md-print -n 50 --no-pager
 1. Verify locally
 
 ```bash
-curl -i http://localhost:7070/ | head -n 20
+curl -i http://localhost:54443/ | head -n 20
 ```
 
 ## Cloudflare Tunnel
@@ -118,7 +125,7 @@ Bind the service in your tunnel config:
 ```yaml
 ingress:
   - hostname: md-print.example.com
-    service: http://localhost:7070
+    service: http://localhost:54443
   - service: http_status:404
 ```
 
@@ -136,7 +143,7 @@ This project works well behind a Cloudflare Tunnel. If you manage routes in the 
 6. Click Add a published application route
 7. Set:
    - Hostname: print.yourdomain.com
-   - Service: <http://localhost:7070>
+   - Service: <http://localhost:54443>
    - Path: *
 8. Save
 
@@ -150,7 +157,7 @@ This repo includes two small shell scripts to make updates reliable on a Raspber
 
 ### Files
 
-- `runner.sh`
+- `run-deploy.sh`
   Pulls the latest code from git, then invokes the deploy script.
 - `deploy.sh`
   Activates the virtual environment, updates dependencies, and restarts the systemd service.
@@ -164,7 +171,7 @@ This two-step design ensures that even if the deploy script itself changes, upda
 Make both scripts executable:
 
 ```bash
-chmod +x runner.sh deploy.sh
+chmod +x run-deploy.sh deploy.sh
 ```
 
 ---
@@ -174,7 +181,7 @@ chmod +x runner.sh deploy.sh
 From the repo root:
 
 ```bash
-./runner.sh
+./run-deploy.sh
 ```
 
 What this does:
@@ -196,14 +203,14 @@ You can override defaults using environment variables:
   Git branch to pull (default: `main`)
 
   ```bash
-  BRANCH=main ./runner.sh
+  BRANCH=main ./run-deploy.sh
   ```
 
 - `SERVICE_NAME`
   systemd service name (default: `md-print`)
 
   ```bash
-  SERVICE_NAME=md-print ./runner.sh
+  SERVICE_NAME=md-print ./run-deploy.sh
   ```
 
 ---
