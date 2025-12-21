@@ -434,7 +434,6 @@ textarea {
     border: 1px solid var(--page-border);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    padding: var(--print-margin);
 }
 
 .page::before {
@@ -463,10 +462,17 @@ textarea {
 
 .page-slice {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: var(--print-margin);
+    left: var(--print-margin);
+    width: calc(100% - (var(--print-margin) + var(--print-margin)));
+    height: calc(100% - (var(--print-margin) + var(--print-margin)));
+    overflow: hidden;
     z-index: 1;
+}
+
+.page-content {
+    position: relative;
+    width: 100%;
 }
 
 .page-preview .print-area {
@@ -668,7 +674,7 @@ textarea {
     }
 
     body {
-        margin: var(--print-margin);
+        margin: 0;
         background: #fff;
         color: #000;
     }
