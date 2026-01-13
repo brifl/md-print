@@ -27,6 +27,11 @@
     --page-break: rgba(108, 97, 82, 0.55);
 }
 
+@page {
+    size: var(--page-width) var(--page-height);
+    margin: 0;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -674,7 +679,7 @@ textarea {
     }
 
     body {
-        margin: 0;
+        margin: var(--print-margin);
         background: #fff;
         color: #000;
     }
@@ -732,7 +737,7 @@ textarea {
     }
 
     .print-area {
-        margin: 0;
+        margin: 0 auto;
         padding: 0;
         box-shadow: none;
         border-radius: 0;

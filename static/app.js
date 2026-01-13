@@ -115,11 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return measurementProbe.getBoundingClientRect().width;
   };
 
-  const pageStyleTag = document.createElement("style");
-  pageStyleTag.setAttribute("data-page-style", "true");
-  document.head.appendChild(pageStyleTag);
-
-
   const updatePagedPreview = () => {
     if (!preview || !pageStack || !previewStage) {
       return;
@@ -216,21 +211,12 @@ document.addEventListener("DOMContentLoaded", () => {
     a4: { width: "8.27in", height: "11.69in" },
     legal: { width: "8.5in", height: "14in" },
   };
-  const defaultPaperKey = paperSize?.value || "letter";
-  let currentPageSize = paperSizes[defaultPaperKey] || paperSizes.letter;
-  let currentMargin = printMargin?.getAttribute("value") || "0.75";
-
-  const updatePageStyle = () => {
-    pageStyleTag.textContent = `@page { size: ${currentPageSize.width} ${currentPageSize.height}; margin: ${currentMargin}in; }`;
-  };
 
   const setPaperSize = (value) => {
     const key = paperSizes[value] ? value : "letter";
     const { width, height } = paperSizes[key];
     document.documentElement.style.setProperty("--page-width", width);
     document.documentElement.style.setProperty("--page-height", height);
-    currentPageSize = paperSizes[key];
-    updatePageStyle();
     if (paperSize) {
       paperSize.value = key;
     }
@@ -243,8 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (printMarginValue) {
       printMarginValue.textContent = `${margin}in`;
     }
-    currentMargin = String(margin);
-    updatePageStyle();
     schedulePagedPreview();
   };
 
