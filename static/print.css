@@ -27,10 +27,6 @@
     --page-break: rgba(108, 97, 82, 0.55);
 }
 
-@page {
-    margin: 0;
-}
-
 * {
     box-sizing: border-box;
 }
@@ -719,7 +715,7 @@ textarea {
         pointer-events: auto;
         width: auto;
         margin: 0;
-        padding: var(--print-margin);
+        padding: 0;
     }
 
     .preview-stage.is-paged .preview-source {
@@ -736,7 +732,7 @@ textarea {
     }
 
     .print-area {
-        margin: 0 auto;
+        margin: 0;
         padding: 0;
         box-shadow: none;
         border-radius: 0;
