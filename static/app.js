@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentMargin = printMargin?.getAttribute("value") || "0.75";
 
   const updatePageStyle = () => {
-    pageStyleTag.textContent = `@page { size: ${currentPageSize.width} ${currentPageSize.height}; margin: ${currentMargin}in; }`;
+    pageStyleTag.textContent = `@page { size: ${currentPageSize.width} ${currentPageSize.height}; margin: 0; }`;
   };
 
   const setPaperSize = (value) => {
