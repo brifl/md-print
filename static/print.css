@@ -28,7 +28,6 @@
 }
 
 @page {
-    size: var(--page-width) var(--page-height);
     margin: 0;
 }
 
@@ -679,7 +678,7 @@ textarea {
     }
 
     body {
-        margin: var(--print-margin);
+        margin: 0;
         background: #fff;
         color: #000;
     }
@@ -720,7 +719,7 @@ textarea {
         pointer-events: auto;
         width: auto;
         margin: 0;
-        padding: 0;
+        padding: var(--print-margin);
     }
 
     .preview-stage.is-paged .preview-source {
